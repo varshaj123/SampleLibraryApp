@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.application'
+    id 'maven-publish'
 }
-apply plugin: 'maven-publish' // Apply this plugin at the top of your library build.gradle
+
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties"))) //Set env variable GPR_USER & GPR_API_KEY if not adding a properties file
@@ -11,7 +12,7 @@ def getVersionName = { ->
 }
 
 def getArtificatId = { ->
-    return "sampleAndroidLib" // Replace with library name ID
+    return "SampleLibraryApp" // Replace with library name ID
 }
 
 publishing {
@@ -68,7 +69,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
 
 dependencies {
 
