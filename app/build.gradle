@@ -1,7 +1,48 @@
 plugins {
     id 'com.android.application'
 }
-apply plugin: 'maven-publish'
+apply plugin: 'maven-publish' // Apply this plugin at the top of your library build.gradle
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties"))) //Set env variable GPR_USER & GPR_API_KEY if not adding a properties file
+
+def getVersionName = { ->
+    return "1.0.2" // Replace with version Name
+}
+
+def getArtificatId = { ->
+    return "sampleAndroidLib" // Replace with library name ID
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId 'com.enefce.libraries' // Replace with group ID
+            artifactId getArtificatId()
+            version getVersionName()
+            artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            /** Configure path of your package repository on Github
+             ** Replace GITHUB_USERID with your/organisation Github userID
+             ** and REPOSITORY with the repository name on GitHub
+             */
+            url = uri("https://maven.pkg.github.com/GITHUB_USERID/REPOSITORY")
+            credentials {
+                /** Create github.properties in root project folder file with
+                 ** gpr.usr=GITHUB_USER_ID & gpr.key=PERSONAL_ACCESS_TOKEN
+                 ** Set env variable GPR_USER & GPR_API_KEY if not adding a properties file**/
+
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
+}
 android {
     namespace 'com.reactsample.samplelibraryapp'
     compileSdk 32
@@ -27,62 +68,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-/*to add as library in github*/
-def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
-def getVersionName = { ->
-    return "1.0.0"  // Replace with version Name
-}
-def getArtificatId = { ->
-    return "sampleAndroidLib" // Replace with library name ID
-}
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
 
-            groupId 'sampleGroup'
-            artifactId project.name
-            version '1.0.0-beta01'
-
-            /*
-             Disabling "from components.java" means that the
-             publishMavenJavaPublicationToMavenLocal
-             task is available on all modules but the jar
-             is not published :(
-           */
-
-//            from components.java
-
-        }
-    }
-}
-/*publishing {
-    publications {
-        bar(MavenPublication) {
-            groupId 'com.enefce.libraries' // Replace with group ID
-            artifactId getArtificatId()
-            version getVersionName()
-            artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            *//** Configure path of your package repository on Github
-             *  Replace GITHUB_USERID with your/organisation Github userID and REPOSITORY with the repository name on GitHub
-             *//*
-            url = uri("https://maven.pkg.github.com/GITHUB_USERID/REPOSITORY")
-
-            credentials {
-                *//**Create github.properties in root project folder file with gpr.usr=GITHUB_USER_ID  & gpr.key=PERSONAL_ACCESS_TOKEN**//*
-                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
-                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
-            }
-        }
-    }
-}*/
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.5.1'
